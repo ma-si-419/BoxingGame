@@ -6,7 +6,6 @@ namespace
 }
 CharacterBase::CharacterBase(const TCHAR* model) :
 	m_pos(),
-	m_damage(0),
 	m_handle(-1),
 	m_isGuard(false),
 	m_isGap(false),
@@ -32,10 +31,6 @@ CharacterBase::~CharacterBase()
 void CharacterBase::Init()
 {
 
-}
-
-void CharacterBase::Update()
-{
 }
 
 void CharacterBase::Draw()

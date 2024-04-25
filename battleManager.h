@@ -13,7 +13,7 @@ public:
 	void Init();
 	void Update();
 
-	void playerAttack(bool player1);
+	void PlayerAttack(bool player1);
 
 
 private:

@@ -14,5 +14,6 @@ public:
 
 private:
 
+	bool m_isPlayer1HitKey;
 };
 

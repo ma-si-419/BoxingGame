@@ -2,6 +2,7 @@
 #include "SceneBase.h"
 #include <memory>
 
+class battleManager;
 class CharacterBase;
 class SceneGame : public SceneBase
 {
@@ -19,6 +20,8 @@ public:
 private:
 	
 	std::shared_ptr<CharacterBase> m_pPlayer;
+	std::shared_ptr<CharacterBase> m_pEnemy;
+	std::shared_ptr<battleManager> m_pBattleManager;
 
 };
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "DxLib.h"
+#include <memory>
+class battleManager;
 class CharacterBase
 {
 public:
@@ -7,7 +9,7 @@ public:
 	virtual ~CharacterBase() = 0;
 
 	virtual void Init() = 0;
-	virtual void Update() = 0;
+	virtual void Update(std::shared_ptr<battleManager> manager) = 0;
 	virtual void Draw() = 0;
 
 	//À•W‚ğİ’è‚·‚é
