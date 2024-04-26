@@ -1,14 +1,15 @@
 #include "SceneGame.h"
+#include "SceneTitle.h"
 #include "DxLib.h"
 #include "Player.h"
-#include "battleManager.h"
+#include "Camera.h"
+
 
 SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager):
 	SceneBase(sceneManager,dataManager)
 {
 	m_pPlayer = std::make_shared<Player>();
-	m_pEnemy = std::make_shared<Player>();
-	m_pBattleManager = std::make_shared<battleManager>(m_pPlayer,m_pEnemy);
+	m_pCamera = std::make_shared<Camera>();
 }
 
 SceneGame::~SceneGame()
@@ -18,13 +19,18 @@ SceneGame::~SceneGame()
 void SceneGame::Init()
 {
 	m_pPlayer->Init();
-	m_pBattleManager->Init();
 }
 
 void SceneGame::Update()
 {
-	m_pPlayer->Update(m_pBattleManager);
-	m_pBattleManager->Update();
+
+	m_pPlayer->Update();
+	m_pCamera->Update();
+
+	if (CheckHitKey(KEY_INPUT_T))
+	{
+		m_sceneManager.ChangeScene(std::make_shared<SceneTitle>(m_sceneManager, m_dataManager));
+	}
 }
 
 void SceneGame::Draw()

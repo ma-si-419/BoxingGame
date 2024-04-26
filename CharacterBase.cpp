@@ -1,46 +1,63 @@
 #include "CharacterBase.h"
-
 namespace
 {
+	//待機時のモーション
 	constexpr int kIdleAnimNumber = 3;
+	//ガード時のモーション
+	constexpr int kGuardAnimNumber = 1;
+	//パンチ時のモーション
+	constexpr int kPunchAnimNumber = 10;
+	//殴られた時のモーション
+	constexpr int kHitReactionAnimNumber = 2;
+	//アニメーションそれぞれの再生速度
+	constexpr float kAnimPlaySpeed[4] = { 1.0f,1.0f,1.0f,1.0f };
 }
-CharacterBase::CharacterBase(const TCHAR* model) :
+CharacterBase::CharacterBase() :
+	m_handle(0),
 	m_pos(),
-	m_handle(-1),
-	m_isGuard(false),
-	m_isGap(false),
+	m_punchPos(),
+	m_attachAnim(0),
 	m_animTime(0),
-	m_animTotalTime(0),
-	m_attachAnim(-1),
-	m_is2P(false)
+	m_totalAnimTime(0),
+	m_playAnim()
 {
-	// ３Ｄモデルの読み込み
-	m_handle = MV1LoadModel(model);
-	ChangeAnim(kIdleAnimNumber);
-	if (m_handle < 0)
-	{
-		printfDx("データ読み込みに失敗");
-	}
 }
 
 CharacterBase::~CharacterBase()
 {
-
 }
 
-void CharacterBase::Init()
+void CharacterBase::ChangeAnim(anim nextAnim)
 {
-
-}
-
-void CharacterBase::Draw()
-{
-}
-
-void CharacterBase::ChangeAnim(int animNum)
-{
-	MV1DetachAnim(m_handle, m_attachAnim);
-	m_attachAnim = MV1AttachAnim(m_handle, animNum);
+	int animNum;
+	//アニメの再生速度を設定
+	m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(nextAnim)];
+	//アニメの再生時間をリセット
 	m_animTime = 0;
-	m_animTotalTime = MV1GetAnimTotalTime(m_handle, animNum);
+	//前のアニメをけす
+	MV1DetachAnim(m_handle, m_attachAnim);
+	//再生しているアニメを保存する
+	m_playAnim = nextAnim;
+	if (nextAnim == anim::kIdle)
+	{
+		animNum = kIdleAnimNumber;
+	}
+	else if (nextAnim == anim::kGuard)
+	{
+		animNum = kGuardAnimNumber;
+		//ガードはモーションの途中で止めるため総再生時間を変える
+		m_totalAnimTime = 18.5f;
+	}
+	else if (nextAnim == anim::kPunch)
+	{
+		animNum = kPunchAnimNumber;
+	}
+	else if (nextAnim == anim::kHitReaction)
+	{
+		animNum = kHitReactionAnimNumber;
+	}
+	//新しいアニメをアタッチする
+	m_attachAnim = MV1AttachAnim(m_handle, animNum);
+	//アニメーションの総再生時間を設定する
+	m_totalAnimTime = MV1GetAnimTotalTime(m_handle, animNum);
 }
