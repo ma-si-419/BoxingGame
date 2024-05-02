@@ -20,6 +20,7 @@ public:
 private:
 	
 	std::shared_ptr<Player> m_pPlayer;
+	std::shared_ptr<Player> m_pEnemy;
 	std::shared_ptr<Camera> m_pCamera;
 };
 

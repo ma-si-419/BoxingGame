@@ -10,7 +10,7 @@ namespace
 	//殴られた時のモーション
 	constexpr int kHitReactionAnimNumber = 2;
 	//アニメーションそれぞれの再生速度
-	constexpr float kAnimPlaySpeed[4] = { 1.0f,1.0f,1.0f,1.0f };
+	constexpr float kAnimPlaySpeed[4] = { 1.5f,2.0f,1.5f,1.0f };
 }
 CharacterBase::CharacterBase() :
 	m_handle(0),
@@ -19,7 +19,13 @@ CharacterBase::CharacterBase() :
 	m_attachAnim(0),
 	m_animTime(0),
 	m_totalAnimTime(0),
-	m_playAnim()
+	m_playAnim(),
+	m_isGuard(false),
+	m_isPunch(false),
+	m_isHitKey(false),
+	m_isPlayer(true),
+	m_animPlaySpeed(0),
+	m_damage(0)
 {
 }
 
@@ -29,7 +35,7 @@ CharacterBase::~CharacterBase()
 
 void CharacterBase::ChangeAnim(anim nextAnim)
 {
-	int animNum;
+	int animNum = 0;
 	//アニメの再生速度を設定
 	m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(nextAnim)];
 	//アニメの再生時間をリセット
@@ -45,8 +51,6 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 	else if (nextAnim == anim::kGuard)
 	{
 		animNum = kGuardAnimNumber;
-		//ガードはモーションの途中で止めるため総再生時間を変える
-		m_totalAnimTime = 18.5f;
 	}
 	else if (nextAnim == anim::kPunch)
 	{
@@ -60,4 +64,9 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 	m_attachAnim = MV1AttachAnim(m_handle, animNum);
 	//アニメーションの総再生時間を設定する
 	m_totalAnimTime = MV1GetAnimTotalTime(m_handle, animNum);
+	if (nextAnim == anim::kGuard)
+	{
+		//ガードはモーションの途中で止めるため総再生時間を変える
+		m_totalAnimTime = 7.0f;
+	}
 }
