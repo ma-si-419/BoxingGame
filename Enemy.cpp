@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Enemy.h"
 namespace
 {
 	//パンチが当たるまでの時間
@@ -16,39 +16,34 @@ namespace
 	//1ダメージごとに動く距離
 	constexpr float kDamageLange = 10;
 }
-Player::Player()
+Enemy::Enemy()
 {
 	m_handle = MV1LoadModel("data/model/Player.mv1");
 	ChangeAnim(anim::kIdle);
 
-	m_pos = VGet(-kEnemyLange, 0, 0);
-	MV1SetRotationXYZ(m_handle, VGet(0, static_cast<float> ((DX_PI_F / 180) * 270), 0));
-
-
-
+	m_pos = VGet(kEnemyLange, 0, 0);
+	MV1SetRotationXYZ(m_handle, VGet(0, static_cast<float> ((DX_PI_F / 180) * 90), 0));
 }
-
-Player::~Player()
+Enemy::~Enemy()
 {
 }
 
-void Player::Init()
+void Enemy::Init()
 {
 }
 
-void Player::Update(std::shared_ptr<CharacterBase> enemy)
+void Enemy::Update(std::shared_ptr<CharacterBase> player)
 {
 	//パンチボタンを押したとき
-	if (CheckHitKey(KEY_INPUT_Z) && !m_isHitKey && !m_isPunch)
+	if (CheckHitKey(KEY_INPUT_O) && !m_isHitKey && !m_isPunch)
 	{
 		ChangeAnim(anim::kPunch);
 		m_isPunch = true;
 		m_isHitKey = true;
 		//相手がパンチを打っている状態だったらパンチの速度をあげる
-		m_isCounter = enemy->GetPunchState();
+		m_isCounter = player->GetPunchState();
 	}
-	//ガードボタンを押したとき
-	if (CheckHitKey(KEY_INPUT_X) && !m_isHitKey)
+	if (CheckHitKey(KEY_INPUT_P) && !m_isHitKey)
 	{
 		printfDx("押した");
 		ChangeAnim(anim::kGuard);
@@ -56,15 +51,13 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 		m_isGuard = true;
 		m_isPunch = false;
 	}
-	//ガードボタンを離したとき
-	else if (!CheckHitKey(KEY_INPUT_X) && m_isGuard)
+	else if (!CheckHitKey(KEY_INPUT_P) && m_isGuard)
 	{
 		//ガードをやめる処理を入れる
 		ChangeAnim(anim::kIdle);
 		m_isGuard = false;
 	}
-	//パンチボタンとガードボタンを離した時
-	if (!CheckHitKey(KEY_INPUT_Z) && !CheckHitKey(KEY_INPUT_X))
+	if (!CheckHitKey(KEY_INPUT_O) && !CheckHitKey(KEY_INPUT_P))
 	{
 		m_isHitKey = false;
 	}
@@ -75,6 +68,7 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 		m_animTime = 0;
 		if (m_playAnim == anim::kPunch || m_playAnim == anim::kHitReaction)
 		{
+			m_isPunch = false;
 			ChangeAnim(anim::kIdle);
 		}
 		else if (m_playAnim == anim::kGuard)
@@ -84,7 +78,6 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	}
 	if (m_isPunch)
 	{
-		//カウンターだった場合パンチが当たるまでのスピードを速める
 		if (m_isCounter)
 		{
 			m_punchTime += kCounterPunchSpeed;
@@ -101,10 +94,10 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	if (m_punchTime > kPunchHitTime)
 	{
 		CharacterBase::damageKind hitKind;
-		hitKind = enemy->OnDamage(m_isCounter);
+		hitKind = player->OnDamage(m_isCounter);
 		HitPunch(hitKind);
 		SetDamagePos();
-		enemy->SetDamagePos();
+		player->SetDamagePos();
 		m_isPunch = false;
 		m_punchTime = 0;
 	}
@@ -113,32 +106,32 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	MV1SetPosition(m_handle, m_pos);
 }
 
-void Player::Draw()
+void Enemy::Draw()
 {
 	MV1DrawModel(m_handle);
-	DrawFormatString(100, 100, GetColor(255, 255, 255), "P%d", m_damage);
+	DrawFormatString(300, 100, GetColor(255, 255, 255), "E%d", -m_damage);
 }
 
-CharacterBase::damageKind Player::OnDamage(bool counter)
+CharacterBase::damageKind Enemy::OnDamage(bool counter)
 {
 	CharacterBase::damageKind ans;
 	//ガードしていたら
 	if (m_isGuard)
 	{
-		m_damage -= kGuardDamage;
+		m_damage += kGuardDamage;
 		ans = damageKind::kGuard;
 	}
 	//カウンターのタイミング
 	else if (counter)
 	{
-		m_damage -= kCounterDamage;
+		m_damage += kCounterDamage;
 		ChangeAnim(anim::kHitReaction);
 		ans = damageKind::kCounter;
 	}
 	//普通にヒット
 	else
 	{
-		m_damage -= kHitDamage;
+		m_damage += kHitDamage;
 		ChangeAnim(anim::kHitReaction);
 		ans = damageKind::kHit;
 	}
@@ -148,23 +141,23 @@ CharacterBase::damageKind Player::OnDamage(bool counter)
 	return ans;
 }
 
-void Player::HitPunch(damageKind kind)
+void Enemy::HitPunch(damageKind kind)
 {
 	if (kind == damageKind::kHit)
 	{
-		m_damage += kHitDamage;
+		m_damage -= kHitDamage;
 	}
 	else if (kind == damageKind::kGuard)
 	{
-		m_damage += kGuardDamage;
+		m_damage -= kGuardDamage;
 	}
 	else if (kind == damageKind::kCounter)
 	{
-		m_damage += kCounterDamage;
+		m_damage -= kCounterDamage;
 	}
 }
 
-void Player::SetDamagePos()
+void Enemy::SetDamagePos()
 {
-	m_pos.x = kDamageLange * m_damage - kEnemyLange;
+	m_pos.x = kDamageLange * m_damage + kEnemyLange;
 }

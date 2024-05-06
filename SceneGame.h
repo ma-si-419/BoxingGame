@@ -3,6 +3,7 @@
 #include <memory>
 
 class Player;
+class Enemy;
 class Camera;
 class SceneGame : public SceneBase
 {
@@ -20,7 +21,7 @@ public:
 private:
 	
 	std::shared_ptr<Player> m_pPlayer;
-	std::shared_ptr<Player> m_pEnemy;
+	std::shared_ptr<Enemy> m_pEnemy;
 	std::shared_ptr<Camera> m_pCamera;
 };
 

@@ -1,18 +1,17 @@
 #pragma once
 #include "CharacterBase.h"
-
-class Player : public CharacterBase
+class Enemy : public CharacterBase
 {
 public:
-	Player();
-	~Player();
+	Enemy();
+	~Enemy();
 
 	void Init();
-	void Update(std::shared_ptr<CharacterBase> enemy);
+	void Update(std::shared_ptr<CharacterBase> player);
 	void Draw();
 
 	//パンチを受けた時の関数
-	CharacterBase::damageKind OnDamage(bool counter);
+	damageKind OnDamage(bool counter);
 	//パンチを当てた時の関数
 	void HitPunch(damageKind kind);
 	//ダメージを受けた時に座標修正する関数

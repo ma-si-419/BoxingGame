@@ -23,9 +23,11 @@ CharacterBase::CharacterBase() :
 	m_isGuard(false),
 	m_isPunch(false),
 	m_isHitKey(false),
+	m_isCounter(false),
 	m_isPlayer(true),
 	m_animPlaySpeed(0),
-	m_damage(0)
+	m_damage(0),
+	m_punchTime(0)
 {
 }
 

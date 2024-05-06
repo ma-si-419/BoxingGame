@@ -2,14 +2,15 @@
 #include "SceneTitle.h"
 #include "DxLib.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "Camera.h"
 
 
 SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager):
 	SceneBase(sceneManager,dataManager)
 {
-	m_pPlayer = std::make_shared<Player>(true);
-	m_pEnemy = std::make_shared<Player>(false);
+	m_pPlayer = std::make_shared<Player>();
+	m_pEnemy = std::make_shared<Enemy>();
 	m_pCamera = std::make_shared<Camera>();
 }
 
