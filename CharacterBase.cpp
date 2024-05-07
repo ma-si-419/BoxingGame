@@ -10,7 +10,7 @@ namespace
 	//殴られた時のモーション
 	constexpr int kHitReactionAnimNumber = 2;
 	//アニメーションそれぞれの再生速度
-	constexpr float kAnimPlaySpeed[4] = { 1.5f,2.0f,1.5f,1.0f };
+	constexpr float kAnimPlaySpeed[4] = { 1.5f,2.0f,1.1f,1.0f };
 }
 CharacterBase::CharacterBase() :
 	m_handle(0),
@@ -27,7 +27,9 @@ CharacterBase::CharacterBase() :
 	m_isPlayer(true),
 	m_animPlaySpeed(0),
 	m_damage(0),
-	m_punchTime(0)
+	m_punchTime(0),
+	m_isGap(false),
+	m_gapTime(0)
 {
 }
 

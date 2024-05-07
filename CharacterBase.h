@@ -1,6 +1,31 @@
 #pragma once
 #include "DxLib.h"
 #include <memory>
+namespace baseConstant
+{
+	//パンチが当たるまでの時間
+	constexpr int kPunchHitTime = 15;
+	//カウンターを打ったときのパンチの速度
+	constexpr int kCounterPunchSpeed = 3;
+	//ヒットした時のダメージ
+	constexpr int kHitDamage = 5;
+	//ヒットした時の硬直
+	constexpr int kHitPunchGapTime = 15;
+	//殴られたときの硬直
+	constexpr int kHitGapTime = 15;
+	//ガードした時のダメージ
+	constexpr int kGuardDamage = 2;
+	//ガードした時の硬直
+	constexpr int kGuardGapTime = 10;
+	//ガードされたときの硬直
+	constexpr int kGuardHitGapTime = 30;
+	//カウンターされた時のダメージ
+	constexpr int kCounterDamage = 12;
+	//基本的な相手との距離
+	constexpr int kEnemyLange = 125;
+	//1ダメージごとに動く距離
+	constexpr float kDamageLange = 10;
+}
 class CharacterBase
 {
 protected:
@@ -17,6 +42,7 @@ protected:
 		kPunch,
 		kHitReaction
 	};
+	
 public:
 	CharacterBase();
 	virtual ~CharacterBase();
@@ -66,5 +92,9 @@ protected:
 	int m_damage;
 	//カウンターかどうか
 	bool m_isCounter;
+	//動ける状態かどうか
+	bool m_isGap;
+	//動けなくなってから何秒か
+	int m_gapTime;
 };
 
