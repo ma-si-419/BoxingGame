@@ -1,11 +1,11 @@
 #include "Player.h"
 Player::Player()
 {
-	m_handle = MV1LoadModel("data/model/Player.mv1");
+	m_model = MV1LoadModel("data/model/Player.mv1");
 	ChangeAnim(anim::kIdle);
 
 	m_pos = VGet(-baseConstant::kEnemyLange, 0, 0);
-	MV1SetRotationXYZ(m_handle, VGet(0, static_cast<float> ((DX_PI_F / 180) * 270), 0));
+	MV1SetRotationXYZ(m_model, VGet(0, static_cast<float> ((DX_PI_F / 180) * 270), 0));
 }
 
 Player::~Player()
@@ -104,13 +104,13 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	{
 		m_isGap = true;
 	}
-	MV1SetAttachAnimTime(m_handle, m_attachAnim, m_animTime);
-	MV1SetPosition(m_handle, m_pos);
+	MV1SetAttachAnimTime(m_model, m_attachAnim, m_animTime);
+	MV1SetPosition(m_model, m_pos);
 }
 
 void Player::Draw()
 {
-	MV1DrawModel(m_handle);
+	MV1DrawModel(m_model);
 	DrawFormatString(100, 100, GetColor(255, 255, 255), "P%d", m_damage);
 }
 

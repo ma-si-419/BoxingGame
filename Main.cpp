@@ -3,12 +3,19 @@
 #include "DataManager.h"
 #include "SceneTitle.h"
 #include <memory>
+namespace
+{
+	constexpr int kWindowHeight = 640;
+	constexpr int kWindowWidth = 480;
+}
+
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// 一部の関数はDxLib_Init()の前に実行する必要がある
 	ChangeWindowMode(true);
 
+	SetWindowSize(kWindowHeight,kWindowWidth);
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
 		return -1;			// エラーが起きたら直ちに終了

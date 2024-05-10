@@ -13,7 +13,7 @@ namespace
 	constexpr float kAnimPlaySpeed[4] = { 1.5f,2.0f,1.1f,1.0f };
 }
 CharacterBase::CharacterBase() :
-	m_handle(0),
+	m_model(0),
 	m_pos(),
 	m_punchPos(),
 	m_attachAnim(0),
@@ -45,7 +45,7 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 	//アニメの再生時間をリセット
 	m_animTime = 0;
 	//前のアニメをけす
-	MV1DetachAnim(m_handle, m_attachAnim);
+	MV1DetachAnim(m_model, m_attachAnim);
 	//再生しているアニメを保存する
 	m_playAnim = nextAnim;
 	if (nextAnim == anim::kIdle)
@@ -65,9 +65,9 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 		animNum = kHitReactionAnimNumber;
 	}
 	//新しいアニメをアタッチする
-	m_attachAnim = MV1AttachAnim(m_handle, animNum);
+	m_attachAnim = MV1AttachAnim(m_model, animNum);
 	//アニメーションの総再生時間を設定する
-	m_totalAnimTime = MV1GetAnimTotalTime(m_handle, animNum);
+	m_totalAnimTime = MV1GetAnimTotalTime(m_model, animNum);
 	if (nextAnim == anim::kGuard)
 	{
 		//ガードはモーションの途中で止めるため総再生時間を変える

@@ -63,7 +63,7 @@ protected:
 	//アニメーションを変更する
 	void ChangeAnim(anim nextAnim);
 	//グラフィック
-	int m_handle;
+	int m_model;
 	//アニメーションを保存する
 	int m_attachAnim;
 	//今再生しているアニメを保存する
