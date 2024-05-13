@@ -12,7 +12,7 @@ public:
 private:
 	int m_groundmodel;
 	int m_spikesmodel;
-	int m_domemodel;
+	int m_domeModel;
 	VECTOR m_groundPos;
 	VECTOR m_spikesPos;
 };

@@ -48,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ScreenFlip();
 
 		// escキーでゲーム終了
-		if (CheckHitKey(KEY_INPUT_ESCAPE))
+		if (CheckHitKey(KEY_INPUT_ESCAPE) || scene.GetEnd())
 		{
 			break;
 		}

@@ -1,7 +1,8 @@
 #include "SceneManager.h"
 #include "SceneTitle.h"
 
-SceneManager::SceneManager()
+SceneManager::SceneManager():
+	m_isEnd(false)
 {
 }
 
