@@ -150,6 +150,7 @@
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="Ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BoxingGame.rc" />

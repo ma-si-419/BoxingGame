@@ -6,6 +6,8 @@ Player::Player()
 
 	m_pos = VGet(-baseConstant::kEnemyLange, 0, 0);
 	MV1SetRotationXYZ(m_model, VGet(0, static_cast<float> ((DX_PI_F / 180) * 270), 0));
+	//1P側と設定
+	m_isPlayer = true;
 }
 
 Player::~Player()
@@ -19,39 +21,46 @@ void Player::Init()
 void Player::Update(std::shared_ptr<CharacterBase> enemy)
 {
 	//動けるタイミングだった時
-	if (!m_isGap)
+	if (!m_isGap && !m_isFinishGame)
 	{
+		//ガードボタンを押したとき
+		if (CheckHitKey(KEY_INPUT_X) && !m_isHitGuardKey)
+		{
+			ChangeAnim(anim::kGuard);
+			m_isGuard = true;
+			m_isHitGuardKey = true;
+			m_isPunch = false;
+		}
 		//パンチボタンを押したとき
-		if (CheckHitKey(KEY_INPUT_Z) && !m_isHitKey && !m_isPunch)
+		if (CheckHitKey(KEY_INPUT_Z) && !m_isHitPunchKey && !m_isPunch)
 		{
 			ChangeAnim(anim::kPunch);
 			m_isPunch = true;
-			m_isHitKey = true;
+			m_isGuard = false;
+			m_isHitPunchKey = true;
 			//相手がパンチを打っている状態だったらパンチの速度をあげる
 			m_isCounter = enemy->GetPunchState();
 		}
-		//ガードボタンを押したとき
-		if (CheckHitKey(KEY_INPUT_X) && !m_isHitKey)
+		//パンチボタンがを離された時の処理
+		if (!CheckHitKey(KEY_INPUT_Z))
 		{
-			ChangeAnim(anim::kGuard);
-			m_isHitKey = true;
-			m_isGuard = true;
-			m_isPunch = false;
+			m_isHitPunchKey = false;
 		}
-		//ガードボタンを離したとき
-		else if (!CheckHitKey(KEY_INPUT_X) && m_isGuard)
+		//ガードボタンが離されたときの処理
+		if (!CheckHitKey(KEY_INPUT_X))
 		{
-			//ガードをやめる処理を入れる
-			ChangeAnim(anim::kIdle);
-			m_isGuard = false;
-		}
-		//パンチボタンとガードボタンを離した時
-		if (!CheckHitKey(KEY_INPUT_Z) && !CheckHitKey(KEY_INPUT_X))
-		{
-			m_isHitKey = false;
+			m_isHitGuardKey = false;
+			//ガードしていたら
+			if (m_isGuard)
+			{
+				//ガードをやめる処理を入れる
+				ChangeAnim(anim::kIdle);
+				m_isGuard = false;
+			}
 		}
 	}
 
+	//アニメーション処理
 	m_animTime += m_animPlaySpeed;
 	//アニメーションの再生時間が最大までいったら
 	if (m_animTime > m_totalAnimTime)
@@ -62,6 +71,10 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 			ChangeAnim(anim::kIdle);
 		}
 		else if (m_playAnim == anim::kGuard)
+		{
+			m_animTime = m_totalAnimTime;
+		}
+		else if (m_playAnim == anim::kLoseReaction)
 		{
 			m_animTime = m_totalAnimTime;
 		}
@@ -112,60 +125,4 @@ void Player::Draw()
 {
 	MV1DrawModel(m_model);
 	DrawFormatString(100, 100, GetColor(255, 255, 255), "P%d", m_damage);
-}
-
-CharacterBase::damageKind Player::OnDamage(bool counter)
-{
-	CharacterBase::damageKind ans;
-	//ガードしていたら
-	if (m_isGuard)
-	{
-		m_damage -= baseConstant::kGuardDamage;
-		m_gapTime = baseConstant::kGuardGapTime;
-		ans = damageKind::kGuard;
-	}
-	//カウンターのタイミング
-	else if (counter)
-	{
-		m_damage -= baseConstant::kCounterDamage;
-		m_gapTime = baseConstant::kHitGapTime;
-		ChangeAnim(anim::kHitReaction);
-		ans = damageKind::kCounter;
-	}
-	//普通にヒット
-	else
-	{
-		m_damage -= baseConstant::kHitDamage;
-		m_gapTime = baseConstant::kHitGapTime;
-		ChangeAnim(anim::kHitReaction);
-		ans = damageKind::kHit;
-	}
-	m_pos.x = baseConstant::kDamageLange * -m_damage + baseConstant::kEnemyLange;
-	m_isPunch = false;
-	m_punchTime = 0;
-	return ans;
-}
-
-void Player::HitPunch(damageKind kind)
-{
-	if (kind == damageKind::kHit)
-	{
-		m_gapTime = baseConstant::kHitPunchGapTime;
-		m_damage += baseConstant::kHitDamage;
-	}
-	else if (kind == damageKind::kGuard)
-	{
-		m_gapTime = baseConstant::kGuardHitGapTime;
-		m_damage += baseConstant::kGuardDamage;
-	}
-	else if (kind == damageKind::kCounter)
-	{
-		m_gapTime = baseConstant::kHitGapTime;
-		m_damage += baseConstant::kCounterDamage;
-	}
-}
-
-void Player::SetDamagePos()
-{
-	m_pos.x = baseConstant::kDamageLange * m_damage - baseConstant::kEnemyLange;
 }

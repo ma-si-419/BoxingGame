@@ -16,7 +16,7 @@ namespace baseConstant
 	//ガードした時のダメージ
 	constexpr int kGuardDamage = 2;
 	//ガードした時の硬直
-	constexpr int kGuardGapTime = 10;
+	constexpr int kGuardGapTime = 5;
 	//ガードされたときの硬直
 	constexpr int kGuardHitGapTime = 30;
 	//カウンターされた時のダメージ
@@ -40,9 +40,11 @@ protected:
 		kIdle,
 		kGuard,
 		kPunch,
-		kHitReaction
+		kHitReaction,
+		kWinReaction,
+		kLoseReaction
 	};
-	
+
 public:
 	CharacterBase();
 	virtual ~CharacterBase();
@@ -52,49 +54,44 @@ public:
 	virtual void Draw() = 0;
 
 	//パンチを受けた時の関数
-	virtual damageKind OnDamage(bool counter) = 0;
+	virtual damageKind OnDamage(bool counter);
 	//パンチを当てた時の関数
-	virtual void HitPunch(damageKind kind) = 0;
+	virtual void HitPunch(damageKind kind);
 	//ダメージを受けた時に座標修正する関数
-	virtual void SetDamagePos() = 0;
+	virtual void SetDamagePos();
+	//ゲームが終了した時に呼ぶ関数
+	virtual void SetFinish(bool player);
 	//今パンチを打っているかどうか
-	virtual bool GetPunchState() = 0;
-protected:	
-	//アニメーションを変更する
-	void ChangeAnim(anim nextAnim);
-	//グラフィック
-	int m_model;
-	//アニメーションを保存する
-	int m_attachAnim;
-	//今再生しているアニメを保存する
-	anim m_playAnim;
-	//アニメーションの再生速度
-	float m_animPlaySpeed;
-	//アニメーションの再生している時間
-	float m_animTime;
-	//アニメーションの総再生時間
-	float m_totalAnimTime;
-	//表示座標
-	VECTOR m_pos;
-	//パンチの座標
-	VECTOR m_punchPos;
-	//ボタンを前のフレームで押したかどうか
-	bool m_isHitKey;
-	//ガードしているかどうか
-	bool m_isGuard;
-	//パンチしているかどうか
-	bool m_isPunch;
-	//パンチを始めてどのくらいの時間がたったか
-	int m_punchTime;
-	//プレイヤー１かどうか
-	bool m_isPlayer;
-	//今どのくらいダメージを受けているかを表す
-	int m_damage;
-	//カウンターかどうか
-	bool m_isCounter;
-	//動ける状態かどうか
-	bool m_isGap;
-	//動けなくなってから何秒か
-	int m_gapTime;
+	virtual bool GetPunchState() { return m_isPunch; };
+	//現在地を返す
+	virtual VECTOR GetPos() { return m_pos; }
+protected:
+	//アニメーション、モデル関係
+	void ChangeAnim(anim nextAnim);	//アニメーションを変更する
+	int m_model;	//グラフィック
+	int m_attachAnim;	//アニメーションを保存する
+	anim m_playAnim;	//今再生しているアニメを保存する
+	float m_animPlaySpeed;	//アニメーションの再生速度
+	float m_animTime;	//アニメーションの再生している時間
+	float m_totalAnimTime;	//アニメーションの総再生時間
+	VECTOR m_pos;	//表示座標
+
+	//操作制御
+	bool m_isHitPunchKey;	//パンチボタンを前のフレームで押したか
+	bool m_isHitGuardKey;	//ガードボタンを前のフレームで押したか
+	bool m_isPlayer;	//プレイヤー１かどうか
+
+	//状態制御
+	bool m_isGuard;	//ガードしているかどうか
+	bool m_isPunch;	//パンチしているかどうか
+	int m_punchTime;	//パンチを始めてどのくらいの時間がたったか
+	int m_damage;	//今どのくらいダメージを受けているかを表す
+	bool m_isCounter;	//カウンターかどうか
+	bool m_isGap;	//動ける状態かどうか
+	int m_gapTime;//動けなくなってから何秒か
+
+	//終了処理関係
+	bool m_isFinishGame;//ゲームが終了したかどうか
+	bool m_isWin;//勝ったかどうか
 };
 

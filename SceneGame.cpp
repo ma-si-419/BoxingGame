@@ -5,14 +5,24 @@
 #include "Enemy.h"
 #include "Camera.h"
 #include "Obstruct.h"
-
-SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager):
-	SceneBase(sceneManager,dataManager)
+#include "Ui.h"
+namespace
+{
+	constexpr int kTimelimit = 30;//制限時間
+	constexpr int kFramelate = 60;//フレームレート
+	constexpr int kFinishDamage = 36;//ダメージの限界値
+}
+SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
+	SceneBase(sceneManager, dataManager),
+	m_isFinish(false),
+	m_timer(kTimelimit),
+	m_timeCount(0)
 {
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
 	m_pCamera = std::make_shared<Camera>();
 	m_pObstruct = std::make_shared<Obstruct>();
+	m_pUi = std::make_shared<Ui>();
 }
 
 SceneGame::~SceneGame()
@@ -24,6 +34,7 @@ void SceneGame::Init()
 	m_pPlayer->Init();
 	m_pEnemy->Init();
 	m_pObstruct->Init();
+	m_pUi->Init();
 }
 
 void SceneGame::Update()
@@ -33,6 +44,54 @@ void SceneGame::Update()
 	m_pEnemy->Update(m_pPlayer);
 	m_pCamera->Update();
 	m_pObstruct->Update();
+	m_pUi->Update();
+	//ゲームが終了していない時の処理
+	if (!m_isFinish)
+	{
+		//時間を経過させる
+		m_timeCount++;
+		//60フレーム数えたら
+		if (m_timeCount > kFramelate)
+		{
+			m_timeCount = 0;
+			//制限時間を減らす
+			m_timer--;
+			//Uiに制限時間を渡す
+			m_pUi->SetTimer(m_timer);
+		}
+		//タイマーが0秒になったら
+		if (m_timer <= 0)
+		{
+			//現時点で勝っている方を取得する
+			if (m_pPlayer->GetDamage() > 0)
+			{
+				//プレイヤーだった場合
+				FinishGame(true);
+			}
+			else if (m_pPlayer->GetDamage() < 0)
+			{
+				//エネミーだった場合
+				FinishGame(false);
+			}
+			else
+			{
+				////////////////////////
+				//引き分けの処理を作る//
+				////////////////////////
+			}
+		}
+		//ダメージを一定量以上受けたら
+		if (m_pPlayer->GetDamage() > kFinishDamage)
+		{
+			//プレイヤーの勝ち
+			FinishGame(true);
+		}
+		else if (m_pPlayer->GetDamage() < -kFinishDamage)
+		{
+			//エネミー側の勝ち
+			FinishGame(false);
+		}
+	}
 
 	if (CheckHitKey(KEY_INPUT_T))
 	{
@@ -45,9 +104,26 @@ void SceneGame::Draw()
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
 	m_pObstruct->Draw();
+	m_pUi->Draw();
 	DrawString(0, 0, "SceneGame", GetColor(255, 255, 255));
 }
 
 void SceneGame::End()
 {
+}
+
+void SceneGame::FinishGame(bool player)
+{
+	m_pPlayer->SetFinish(player);
+	m_pEnemy->SetFinish(player);
+	m_pUi->SetFinish(player);
+	m_isFinish = true;
+	if (player)
+	{
+		m_pCamera->SetWinner(m_pPlayer->GetPos());
+	}
+	else
+	{
+		m_pCamera->SetWinner(m_pEnemy->GetPos());
+	}
 }
