@@ -12,6 +12,7 @@ Player::Player()
 
 Player::~Player()
 {
+	MV1DeleteModel(m_model);
 }
 
 void Player::Init()
@@ -61,24 +62,8 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	}
 
 	//アニメーション処理
-	m_animTime += m_animPlaySpeed;
-	//アニメーションの再生時間が最大までいったら
-	if (m_animTime > m_totalAnimTime)
-	{
-		m_animTime = 0;
-		if (m_playAnim == anim::kPunch || m_playAnim == anim::kHitReaction)
-		{
-			ChangeAnim(anim::kIdle);
-		}
-		else if (m_playAnim == anim::kGuard)
-		{
-			m_animTime = m_totalAnimTime;
-		}
-		else if (m_playAnim == anim::kLoseReaction)
-		{
-			m_animTime = m_totalAnimTime;
-		}
-	}
+	PlayAnim();
+	//パンチの処理
 	if (m_isPunch)
 	{
 		//カウンターだった場合パンチが当たるまでのスピードを速める
@@ -124,5 +109,4 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 void Player::Draw()
 {
 	MV1DrawModel(m_model);
-	DrawFormatString(100, 100, GetColor(255, 255, 255), "P%d", m_damage);
 }

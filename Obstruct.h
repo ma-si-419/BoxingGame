@@ -10,8 +10,8 @@ public:
 	void Update();
 	void Draw();
 private:
-	int m_groundmodel;
-	int m_spikesmodel;
+	int m_groundModel;
+	int m_spikesModel;
 	int m_domeModel;
 	VECTOR m_groundPos;
 	VECTOR m_spikesPos;

@@ -30,6 +30,8 @@ private:
 	int m_fingerHandle;//指の画像ハンドル
 	VECTOR m_fingerPos;//指の座標
 
+	bool m_isHitKey;//前のフレームでエンターキーを押していたか
+
 	float m_fingerShake;//指の揺らす座標
 
 	Command m_selectCommand;//選んでいる項目

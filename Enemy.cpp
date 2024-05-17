@@ -1,4 +1,8 @@
 #include "Enemy.h"
+namespace
+{
+	constexpr float kCounterAnimSpeed = 3.0f;
+}
 Enemy::Enemy()
 {
 	m_model = MV1LoadModel("data/model/Player.mv1");
@@ -11,6 +15,7 @@ Enemy::Enemy()
 }
 Enemy::~Enemy()
 {
+	MV1DeleteModel(m_model);
 }
 
 void Enemy::Init()
@@ -60,19 +65,8 @@ void Enemy::Update(std::shared_ptr<CharacterBase> player)
 
 	}
 	//アニメーション処理
-	m_animTime += m_animPlaySpeed;
-	if (m_animTime > m_totalAnimTime)
-	{
-		m_animTime = 0;
-		if (m_playAnim == anim::kPunch || m_playAnim == anim::kHitReaction)
-		{
-			ChangeAnim(anim::kIdle);
-		}
-		else if (m_playAnim == anim::kGuard)
-		{
-			m_animTime = m_totalAnimTime;
-		}
-	}
+	PlayAnim();
+	//パンチの処理
 	if (m_isPunch)
 	{
 		if (m_isCounter)
@@ -117,5 +111,4 @@ void Enemy::Update(std::shared_ptr<CharacterBase> player)
 void Enemy::Draw()
 {
 	MV1DrawModel(m_model);
-	DrawFormatString(300, 100, GetColor(255, 255, 255), "E%d", -m_damage);
 }

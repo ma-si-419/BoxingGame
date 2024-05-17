@@ -14,7 +14,7 @@ namespace
 	//負けた時のモーション
 	constexpr int kLoseReactionAnimNumber = 0;
 	//アニメーションそれぞれの再生速度
-	constexpr float kAnimPlaySpeed[6] = { 1.5f,2.0f,1.1f,1.0f,1.5f,2.0f };
+	constexpr float kAnimPlaySpeed[7] = { 1.5f,2.0f,1.1f,4.1f,1.0f,1.5f,2.0f };
 }
 CharacterBase::CharacterBase() :
 	m_model(0),
@@ -34,8 +34,16 @@ CharacterBase::CharacterBase() :
 	m_isGap(false),
 	m_gapTime(0),
 	m_isFinishGame(false),
-	m_isWin(false)
+	m_isWin(false),
+	m_isDraw(false),
+	m_isHitGuardKey(false),
+	m_hitCounterSound(-1),
+	m_hitPunchSound(-1),
+	m_guardSound(-1)
 {
+	m_hitCounterSound = LoadSoundMem("data/sound/hitCounter.mp3");
+	m_hitPunchSound = LoadSoundMem("data/sound/hitPunch.mp3");
+	m_guardSound = LoadSoundMem("data/sound/guard.mp3");
 }
 
 CharacterBase::~CharacterBase()
@@ -61,7 +69,7 @@ CharacterBase::damageKind CharacterBase::OnDamage(bool counter)
 			m_damage -= baseConstant::kCounterDamage;
 			m_gapTime = baseConstant::kHitGapTime;
 			ChangeAnim(anim::kHitReaction);
-			ans = damageKind::kCounter;
+			ans = damageKind::kCounterHit;
 		}
 		//普通にヒット
 		else
@@ -69,7 +77,7 @@ CharacterBase::damageKind CharacterBase::OnDamage(bool counter)
 			m_damage -= baseConstant::kHitDamage;
 			m_gapTime = baseConstant::kHitGapTime;
 			ChangeAnim(anim::kHitReaction);
-			ans = damageKind::kHit;
+			ans = damageKind::kPunchHit;
 		}
 		m_pos.x = baseConstant::kDamageLange * -m_damage + baseConstant::kEnemyLange;
 		m_isPunch = false;
@@ -91,7 +99,7 @@ CharacterBase::damageKind CharacterBase::OnDamage(bool counter)
 			m_damage += baseConstant::kCounterDamage;
 			m_gapTime = baseConstant::kHitGapTime;
 			ChangeAnim(anim::kHitReaction);
-			ans = damageKind::kCounter;
+			ans = damageKind::kCounterHit;
 		}
 		//普通にヒット
 		else
@@ -99,7 +107,7 @@ CharacterBase::damageKind CharacterBase::OnDamage(bool counter)
 			m_damage += baseConstant::kHitDamage;
 			m_gapTime = baseConstant::kHitGapTime;
 			ChangeAnim(anim::kHitReaction);
-			ans = damageKind::kHit;
+			ans = damageKind::kPunchHit;
 		}
 		m_pos.x = baseConstant::kDamageLange * -m_damage + baseConstant::kEnemyLange;
 		m_isPunch = false;
@@ -114,7 +122,7 @@ void CharacterBase::HitPunch(damageKind kind)
 	if (m_isPlayer)
 	{
 		//ヒット
-		if (kind == damageKind::kHit)
+		if (kind == damageKind::kPunchHit)
 		{
 			m_gapTime = baseConstant::kHitPunchGapTime;
 			m_damage += baseConstant::kHitDamage;
@@ -126,7 +134,7 @@ void CharacterBase::HitPunch(damageKind kind)
 			m_damage += baseConstant::kGuardDamage;
 		}
 		//カウンター
-		else if (kind == damageKind::kCounter)
+		else if (kind == damageKind::kCounterHit)
 		{
 			m_gapTime = baseConstant::kHitGapTime;
 			m_damage += baseConstant::kCounterDamage;
@@ -135,7 +143,7 @@ void CharacterBase::HitPunch(damageKind kind)
 	else
 	{
 		//ヒット
-		if (kind == damageKind::kHit)
+		if (kind == damageKind::kPunchHit)
 		{
 			m_gapTime = baseConstant::kHitPunchGapTime;
 			m_damage -= baseConstant::kHitDamage;
@@ -147,12 +155,13 @@ void CharacterBase::HitPunch(damageKind kind)
 			m_damage -= baseConstant::kGuardDamage;
 		}
 		//カウンター
-		else if (kind == damageKind::kCounter)
+		else if (kind == damageKind::kCounterHit)
 		{
 			m_gapTime = baseConstant::kHitGapTime;
 			m_damage -= baseConstant::kCounterDamage;
 		}
 	}
+	m_isCounter = false;
 }
 
 void CharacterBase::SetDamagePos()
@@ -196,11 +205,23 @@ void CharacterBase::SetFinish(bool player)
 
 }
 
+void CharacterBase::SetDraw()
+{
+	m_isFinishGame = true;
+	m_isDraw = true;
+	ChangeAnim(anim::kLoseReaction);
+}
+
 void CharacterBase::ChangeAnim(anim nextAnim)
 {
 	int animNum = 0;
 	//アニメの再生速度を設定
 	m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(nextAnim)];
+	//カウンターだったら
+	///////////////////////////////////////if (m_isCounter)
+	{
+		m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(anim::kCounter)];
+	}
 	//アニメの再生時間をリセット
 	m_animTime = 0;
 	//前のアニメをけす
@@ -239,5 +260,26 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 	{
 		//ガードはモーションの途中で止めるため総再生時間を変える
 		m_totalAnimTime = 7.0f;
+	}
+}
+
+void CharacterBase::PlayAnim()
+{
+	m_animTime += m_animPlaySpeed;
+
+	if (m_animTime > m_totalAnimTime)
+	{
+		m_animTime = 0;
+		//パンチかヒットリアクションのアニメーションが終わった時の処理
+		if (m_playAnim == anim::kPunch || m_playAnim == anim::kHitReaction)
+		{
+			//待機状態に戻す
+			ChangeAnim(anim::kIdle);
+		}
+		//ガードアニメと負けた時のアニメは最後で止めた状態で動かさない
+		else if (m_playAnim == anim::kGuard || m_playAnim == anim::kLoseReaction)
+		{
+			m_animTime = m_totalAnimTime;
+		}
 	}
 }

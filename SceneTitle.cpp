@@ -22,6 +22,10 @@ namespace
 	//シーンを選択する指の座標
 	constexpr int kFingerPosX = 150;
 	constexpr int kFingerPosY[2] = { 345,415 };
+	//指を揺らすスピード
+	constexpr float kFingerShakeSpeed = 0.3f;
+	//指を揺らす大きさ
+	constexpr int kFingerShakeScale = 10;
 }
 SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 	SceneBase(sceneManager, dataManager),
@@ -31,7 +35,8 @@ SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 	m_fingerHandle(-1),
 	m_fingerPos(),
 	m_fingerShake(0),
-	m_selectCommand(Command::kStart)
+	m_selectCommand(Command::kStart),
+	m_isHitKey(true)
 {
 	m_logoHandle = LoadGraph("data/image/titleImage.png");
 	m_fingerHandle = LoadGraph("data/image/finger.png");
@@ -47,6 +52,9 @@ SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 
 SceneTitle::~SceneTitle()
 {
+	MV1DeleteModel(m_characterModel[0]);
+	MV1DeleteModel(m_characterModel[1]);
+	MV1DeleteModel(m_domeModel);
 }
 
 void SceneTitle::Init()
@@ -66,7 +74,8 @@ void SceneTitle::Update()
 		m_fingerPos.y = kFingerPosY[1];
 		m_selectCommand = Command::kEnd;
 	}
-	if (CheckHitKey(KEY_INPUT_RETURN))
+	//エンターキーが押されたとき
+	if (CheckHitKey(KEY_INPUT_RETURN) && !m_isHitKey)
 	{
 		if (m_selectCommand == Command::kStart)
 		{
@@ -76,10 +85,17 @@ void SceneTitle::Update()
 		{
 			m_sceneManager.GameEnd();
 		}
+		m_isHitKey = true;
 	}
-	m_fingerShake += 0.3f;
+	//エンターキーが連打されないように
+	else if(!CheckHitKey(KEY_INPUT_RETURN))
+	{
+		m_isHitKey = false;
+	}
 
-	float fingerShakeX = sin(m_fingerShake) * 10;
+	m_fingerShake += kFingerShakeSpeed;
+
+	float fingerShakeX = sin(m_fingerShake) * kFingerShakeScale;
 
 	m_fingerPos.x = kFingerPosX + fingerShakeX;
 

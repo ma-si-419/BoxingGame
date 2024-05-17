@@ -16,7 +16,8 @@ SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
 	SceneBase(sceneManager, dataManager),
 	m_isFinish(false),
 	m_timer(kTimelimit),
-	m_timeCount(0)
+	m_timeCount(0),
+	m_isDraw(false)
 {
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
@@ -75,9 +76,8 @@ void SceneGame::Update()
 			}
 			else
 			{
-				////////////////////////
-				//ˆø‚«•ª‚¯‚Ìˆ—‚ğì‚é//
-				////////////////////////
+				//ˆø‚«•ª‚¯‚¾‚Á‚½ê‡
+				DrawGame();
 			}
 		}
 		//ƒ_ƒ[ƒW‚ğˆê’è—ÊˆÈãó‚¯‚½‚ç
@@ -92,10 +92,13 @@ void SceneGame::Update()
 			FinishGame(false);
 		}
 	}
-
-	if (CheckHitKey(KEY_INPUT_T))
+	else
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneTitle>(m_sceneManager, m_dataManager));
+		if (CheckHitKeyAll() && m_pUi->GetFinishStaging())
+		{
+			m_sceneManager.ChangeScene(std::make_shared<SceneTitle>(m_sceneManager, m_dataManager));
+			return;
+		}
 	}
 }
 
@@ -126,4 +129,14 @@ void SceneGame::FinishGame(bool player)
 	{
 		m_pCamera->SetWinner(m_pEnemy->GetPos());
 	}
+}
+
+void SceneGame::DrawGame()
+{
+	m_isFinish = true;
+	m_isDraw = true;
+
+	m_pPlayer->SetDraw();
+	m_pEnemy->SetDraw();
+	m_pUi->SetDraw();
 }

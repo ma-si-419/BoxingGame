@@ -12,19 +12,36 @@ class SceneGame : public SceneBase
 public:
 	SceneGame(SceneManager& sceneManager, DataManager& dataManager);
 	~SceneGame();
-	//初期化処理
+	/// <summary>
+	/// 初期化処理
+	/// </summary>
 	void Init();
-	//更新処理
+	/// <summary>
+	/// 更新処理
+	/// </summary>
 	void Update();
-	//描画処理
+	/// <summary>
+	/// 描画処理
+	/// </summary>
 	void Draw();
-	//終了処理
+	/// <summary>
+	/// 終了処理
+	/// </summary>
 	void End();
-	//勝ち負けが決まった時に呼ぶ関数
+	/// <summary>
+	/// 勝ち負けが決まった時に呼ぶ関数
+	/// </summary>
+	/// <param name="player">1P側が勝ったかどうか</param>
 	void FinishGame(bool player);
+	/// <summary>
+	/// 引き分けになった時に呼ぶ関数
+	/// </summary>
+	void DrawGame();
 private:
 
 	bool m_isFinish;//ゲームが終了したかどうか
+
+	bool m_isDraw;//引き分けかどうか
 
 	int m_timer;//制限時間
 
