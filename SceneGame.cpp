@@ -13,13 +13,19 @@ namespace
 	constexpr int kFinishDamage = 36;//ダメージの限界値
 
 	constexpr int kBgmVol = 150;//BGMの大きさ
+
+	constexpr int kCountDownTime = 3;//カウントダウンの時間
 }
 SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
 	SceneBase(sceneManager, dataManager),
 	m_isFinish(false),
 	m_timer(kTimelimit),
 	m_timeCount(0),
-	m_isDraw(false)
+	m_isDraw(false),
+	m_isStartCountDown(false),
+	m_isStartGame(false),
+	m_countDown(kCountDownTime)
+
 {
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
@@ -51,20 +57,51 @@ void SceneGame::Init()
 	m_pObstruct->Init();
 	m_pUi->Init();
 
-	PlaySoundMem(m_startGameSound,DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_startGameSound, DX_PLAYTYPE_BACK);
 	PlaySoundMem(m_bgmSound, DX_PLAYTYPE_LOOP);
 }
 
 void SceneGame::Update()
 {
-
-	m_pPlayer->Update(m_pEnemy);
-	m_pEnemy->Update(m_pPlayer);
+	int pad = GetJoypadInputState(PAD_INPUT_1);
+	//カウントダウンを始めるまで
+	if (!m_isStartCountDown)
+	{
+		if (CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_pUi->SetOperation(false);
+			m_isStartCountDown = true;
+		}
+		else if (pad & PAD_INPUT_A)
+		{
+			m_pUi->SetOperation(true);
+			m_isStartCountDown = true;
+		}
+	}
+	//カウントダウン処理
+	if (!m_isStartGame && m_isStartCountDown)
+	{
+		m_timeCount++;
+		if (m_timeCount > kFramelate)
+		{
+			m_countDown--;
+			m_timeCount = 0;
+		}
+		if (m_countDown <= 0)
+		{
+			m_isStartGame = true;
+		}
+	}
+	else
+	{
+		m_pPlayer->Update(m_pEnemy);
+		m_pEnemy->Update(m_pPlayer);
+	}
 	m_pCamera->Update();
 	m_pObstruct->Update();
 	m_pUi->Update();
 	//ゲームが終了していない時の処理
-	if (!m_isFinish)
+	if (!m_isFinish && m_isStartGame)
 	{
 		//時間を経過させる
 		m_timeCount++;
@@ -124,8 +161,14 @@ void SceneGame::Draw()
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
 	m_pObstruct->Draw();
-	m_pUi->Draw();
-	DrawString(0, 0, "SceneGame", GetColor(255, 255, 255));
+	if (!m_isStartGame)
+	{
+		m_pUi->DrawCountDown(m_countDown);
+	}
+	else
+	{
+		m_pUi->Draw();
+	}
 }
 
 void SceneGame::End()
@@ -138,7 +181,7 @@ void SceneGame::FinishGame(bool player)
 	m_pEnemy->SetFinish(player);
 	m_pUi->SetFinish(player);
 	m_isFinish = true;
-	PlaySoundMem(m_finishGameSound,DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_finishGameSound, DX_PLAYTYPE_BACK);
 	PlaySoundMem(m_winGameSound, DX_PLAYTYPE_BACK);
 	if (player)
 	{

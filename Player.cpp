@@ -17,6 +17,7 @@ Player::~Player()
 
 void Player::Init()
 {
+	MV1SetPosition(m_model, m_pos);
 }
 
 void Player::Update(std::shared_ptr<CharacterBase> enemy)

@@ -39,11 +39,17 @@ public:
 	void DrawGame();
 private:
 
+	bool m_isStartCountDown;//カウントダウンが始まったかどうか
+
+	bool m_isStartGame;//ゲームが始まったかどうか
+
 	bool m_isFinish;//ゲームが終了したかどうか
 
 	bool m_isDraw;//引き分けかどうか
 
 	int m_timer;//制限時間
+
+	int m_countDown;//最初のカウントダウン
 
 	int m_timeCount;//時間を数えるときに使用
 

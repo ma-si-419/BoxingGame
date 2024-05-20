@@ -17,6 +17,11 @@ public:
 	void DrawTimer();
 
 	/// <summary>
+	/// カウントダウンを表示する
+	/// </summary>
+	void DrawCountDown(int time);
+
+	/// <summary>
 	/// 試合が終了した時に呼ぶ
 	/// </summary>
 	/// <param name="player">勝った方が1P側かどうか</param>
@@ -39,6 +44,11 @@ public:
 	/// <returns>試合が終了したかどうか</returns>
 	bool GetFinishStaging() { return !m_isStagingGraphShake; }
 
+	/// <summary>
+	/// キーボードとパッドどちらで操作しているか設定する
+	/// </summary>
+	/// <param name="pad">パッドかどうか</param>
+	void SetOperation(bool pad) { m_isPad = pad; }
 private:
 	bool m_isFinish;//ゲームが終了したか
 
@@ -47,6 +57,11 @@ private:
 	bool m_isWinPlayer;//どちらのプレイヤーが勝ったか
 
 	bool m_isDraw;//引き分けかどうか
+
+	int m_keyManualGraph;//キーボードのマニュアル画像
+	int m_padManualGraph;//コントローラーのマニュアル画像
+
+	bool m_isPad;//どちらの操作を行っているか
 
 	/*勝ち負けが決まったときに表示する画像ハンドル*/
 	int m_winPlayerGraph;

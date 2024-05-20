@@ -18,20 +18,23 @@ namespace
 	constexpr int kStagingShakeScale = 40;	//揺れの大きさ
 
 }
-Ui::Ui():
+Ui::Ui() :
 	m_isFinish(false),
 	m_timer(kTimelimit),
 	m_isWinPlayer(false),
 	m_isDraw(false),
 	m_stagingGraphScale(kStagingGraphInitSize),
 	m_isStagingGraphShake(true),
-	m_shakeTime(0)
+	m_shakeTime(0),
+	m_isPad(true)
 {
 	m_stagingGraphPos = VGet(Game::kWindowWidth / 2, Game::kWindowHeight / 2, 0);
 
 	m_winPlayerGraph = LoadGraph("data/image/winPlayer.png");
 	m_winEnemyGraph = LoadGraph("data/image/winEnemy.png");
 	m_drawGraph = LoadGraph("data/image/draw.png");
+	m_keyManualGraph = LoadGraph("data/image/keyManual.png");
+	m_padManualGraph = LoadGraph("data/image/padManual.png");
 
 	m_timerMap['0'] = LoadGraph("data/image/zero.png");
 	m_timerMap['1'] = LoadGraph("data/image/one.png");
@@ -51,7 +54,7 @@ Ui::~Ui()
 
 void Ui::Init()
 {
-	
+
 }
 
 void Ui::Update()
@@ -59,14 +62,14 @@ void Ui::Update()
 	//ゲームが終了したら
 	if (m_isDraw || m_isFinish)
 	{
-		
+
 		//縮小しすぎないように
 		if (m_stagingGraphScale > 1.0)
 		{
 			m_stagingGraphScale -= kStagingSpeed;
 		}
 		//縮小しきったら
-		else if(m_isStagingGraphShake)
+		else if (m_isStagingGraphShake)
 		{
 			//少しだけ揺らす
 			m_stagingGraphPos.x += GetRand(kStagingShakeScale) - kStagingShakeScale / 2;
@@ -87,12 +90,23 @@ void Ui::Update()
 
 void Ui::Draw()
 {
-	//ゲーム終了した時の演出
+	/*常に表示する*/
+	if (m_isPad)
+	{
+		DrawGraph(0, 0, m_padManualGraph, true);
+	}
+	else
+	{
+		DrawGraph(0, 0, m_keyManualGraph, true);
+	}
+	DrawTimer();
+
+	/*ゲーム終了した時の演出*/
 	if (m_isFinish)
 	{
 		if (m_isWinPlayer)
 		{
-			DrawRotaGraph(m_stagingGraphPos.x, m_stagingGraphPos.y,m_stagingGraphScale,0, m_winPlayerGraph,true);
+			DrawRotaGraph(m_stagingGraphPos.x, m_stagingGraphPos.y, m_stagingGraphScale, 0, m_winPlayerGraph, true);
 		}
 		else
 		{
@@ -104,7 +118,6 @@ void Ui::Draw()
 	{
 		DrawRotaGraph(m_stagingGraphPos.x, m_stagingGraphPos.y, m_stagingGraphScale, 0, m_drawGraph, true);
 	}
-	DrawTimer();
 
 }
 
@@ -129,4 +142,14 @@ void Ui::DrawTimer()
 		DrawGraph(kTimerPosX - kTimerScale, kTimerPosY, m_timerMap[temp], true);
 		DrawGraph(kTimerPosX + kTimerScale, kTimerPosY, m_timerMap[temp2], true);
 	}
+}
+
+void Ui::DrawCountDown(int time)
+{
+	//タイマーが今何秒か取得
+	std::string timeNumber = std::to_string(time);
+	//一桁目をchar型に保存
+	char temp = timeNumber.at(0);
+	//画像を表示する
+	DrawRotaGraph(Game::kWindowWidth / 2,Game::kWindowHeight / 2,2.0,0.0, m_timerMap[temp], true);
 }
