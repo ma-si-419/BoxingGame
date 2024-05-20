@@ -36,6 +36,8 @@ private:
 
 	Command m_selectCommand;//選んでいる項目
 
-	std::shared_ptr<Camera> m_pCamera;
+	std::shared_ptr<Camera> m_pCamera;//カメラのポイント
+
+	int m_bgmSound;//BGM
 
 };

@@ -11,6 +11,8 @@ namespace
 	constexpr int kTimelimit = 30;//制限時間
 	constexpr int kFramelate = 60;//フレームレート
 	constexpr int kFinishDamage = 36;//ダメージの限界値
+
+	constexpr int kBgmVol = 150;//BGMの大きさ
 }
 SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
 	SceneBase(sceneManager, dataManager),
@@ -24,10 +26,22 @@ SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
 	m_pCamera = std::make_shared<Camera>();
 	m_pObstruct = std::make_shared<Obstruct>();
 	m_pUi = std::make_shared<Ui>();
+
+	m_drawSound = LoadSoundMem("data/sound/draw.mp3");
+	m_finishGameSound = LoadSoundMem("data/sound/finishBattle.mp3");
+	m_winGameSound = LoadSoundMem("data/sound/win.mp3");
+	m_startGameSound = LoadSoundMem("data/sound/startBattle.mp3");
+	m_bgmSound = LoadSoundMem("data/sound/gameSceneBgm.mp3");
+	ChangeVolumeSoundMem(kBgmVol, m_bgmSound);
 }
 
 SceneGame::~SceneGame()
 {
+	StopSoundMem(m_startGameSound);
+	StopSoundMem(m_drawSound);
+	StopSoundMem(m_winGameSound);
+	StopSoundMem(m_finishGameSound);
+	StopSoundMem(m_bgmSound);
 }
 
 void SceneGame::Init()
@@ -36,6 +50,9 @@ void SceneGame::Init()
 	m_pEnemy->Init();
 	m_pObstruct->Init();
 	m_pUi->Init();
+
+	PlaySoundMem(m_startGameSound,DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_bgmSound, DX_PLAYTYPE_LOOP);
 }
 
 void SceneGame::Update()
@@ -121,6 +138,8 @@ void SceneGame::FinishGame(bool player)
 	m_pEnemy->SetFinish(player);
 	m_pUi->SetFinish(player);
 	m_isFinish = true;
+	PlaySoundMem(m_finishGameSound,DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_winGameSound, DX_PLAYTYPE_BACK);
 	if (player)
 	{
 		m_pCamera->SetWinner(m_pPlayer->GetPos());
@@ -135,6 +154,9 @@ void SceneGame::DrawGame()
 {
 	m_isFinish = true;
 	m_isDraw = true;
+
+	PlaySoundMem(m_finishGameSound, DX_PLAYTYPE_BACK);
+	PlaySoundMem(m_drawSound, DX_PLAYTYPE_BACK);
 
 	m_pPlayer->SetDraw();
 	m_pEnemy->SetDraw();

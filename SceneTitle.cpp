@@ -26,6 +26,8 @@ namespace
 	constexpr float kFingerShakeSpeed = 0.3f;
 	//指を揺らす大きさ
 	constexpr int kFingerShakeScale = 10;
+	//BGMの大きさ
+	constexpr int kBgmVol = 150;
 }
 SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 	SceneBase(sceneManager, dataManager),
@@ -41,6 +43,10 @@ SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 	m_logoHandle = LoadGraph("data/image/titleImage.png");
 	m_fingerHandle = LoadGraph("data/image/finger.png");
 	m_domeModel = MV1LoadModel("data/model/Dome.mv1");
+
+	m_bgmSound = LoadSoundMem("data/sound/selectSceneBgm.mp3");
+	ChangeVolumeSoundMem(kBgmVol,m_bgmSound);
+
 	MV1SetScale(m_domeModel, kSkyDomeScale);
 
 	InitChar();
@@ -55,21 +61,24 @@ SceneTitle::~SceneTitle()
 	MV1DeleteModel(m_characterModel[0]);
 	MV1DeleteModel(m_characterModel[1]);
 	MV1DeleteModel(m_domeModel);
+
+	StopSoundMem(m_bgmSound);
 }
 
 void SceneTitle::Init()
 {
+	PlaySoundMem(m_bgmSound, DX_PLAYTYPE_LOOP);
 }
 
 void SceneTitle::Update()
 {
 	m_pCamera->Update();
-	if (CheckHitKey(KEY_INPUT_UP))
+	if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_W))
 	{
 		m_fingerPos.y = kFingerPosY[0];
 		m_selectCommand = Command::kStart;
 	}
-	else if (CheckHitKey(KEY_INPUT_DOWN))
+	else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_S))
 	{
 		m_fingerPos.y = kFingerPosY[1];
 		m_selectCommand = Command::kEnd;
@@ -88,7 +97,7 @@ void SceneTitle::Update()
 		m_isHitKey = true;
 	}
 	//エンターキーが連打されないように
-	else if(!CheckHitKey(KEY_INPUT_RETURN))
+	else if (!CheckHitKey(KEY_INPUT_RETURN))
 	{
 		m_isHitKey = false;
 	}

@@ -126,18 +126,21 @@ void CharacterBase::HitPunch(damageKind kind)
 		{
 			m_gapTime = baseConstant::kHitPunchGapTime;
 			m_damage += baseConstant::kHitDamage;
+			PlaySoundMem(m_hitPunchSound, DX_PLAYTYPE_BACK);
 		}
 		//ガード
 		else if (kind == damageKind::kGuard)
 		{
 			m_gapTime = baseConstant::kGuardHitGapTime;
 			m_damage += baseConstant::kGuardDamage;
+			PlaySoundMem(m_guardSound, DX_PLAYTYPE_BACK);
 		}
 		//カウンター
 		else if (kind == damageKind::kCounterHit)
 		{
 			m_gapTime = baseConstant::kHitGapTime;
 			m_damage += baseConstant::kCounterDamage;
+			PlaySoundMem(m_hitCounterSound, DX_PLAYTYPE_BACK);
 		}
 	}
 	else
@@ -147,18 +150,21 @@ void CharacterBase::HitPunch(damageKind kind)
 		{
 			m_gapTime = baseConstant::kHitPunchGapTime;
 			m_damage -= baseConstant::kHitDamage;
+			PlaySoundMem(m_hitPunchSound, DX_PLAYTYPE_BACK);
 		}
 		//ガード
 		else if (kind == damageKind::kGuard)
 		{
 			m_gapTime = baseConstant::kGuardHitGapTime;
 			m_damage -= baseConstant::kGuardDamage;
+			PlaySoundMem(m_guardSound, DX_PLAYTYPE_BACK);
 		}
 		//カウンター
 		else if (kind == damageKind::kCounterHit)
 		{
 			m_gapTime = baseConstant::kHitGapTime;
 			m_damage -= baseConstant::kCounterDamage;
+			PlaySoundMem(m_hitCounterSound, DX_PLAYTYPE_BACK);
 		}
 	}
 	m_isCounter = false;
@@ -218,7 +224,7 @@ void CharacterBase::ChangeAnim(anim nextAnim)
 	//アニメの再生速度を設定
 	m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(nextAnim)];
 	//カウンターだったら
-	///////////////////////////////////////if (m_isCounter)
+	if (m_isCounter)
 	{
 		m_animPlaySpeed = kAnimPlaySpeed[static_cast<int>(anim::kCounter)];
 	}
