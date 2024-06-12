@@ -26,6 +26,7 @@ namespace baseConstant
 	//1ダメージごとに動く距離
 	constexpr float kDamageLange = 10;
 }
+class Input;
 class CharacterBase
 {
 protected:
@@ -51,7 +52,7 @@ public:
 	virtual ~CharacterBase();
 
 	virtual void Init() = 0;
-	virtual void Update(std::shared_ptr<CharacterBase> player) = 0;
+	virtual void Update(std::shared_ptr<CharacterBase> player,Input input) = 0;
 	virtual void Draw() = 0;
 
 	//パンチを受けた時の関数

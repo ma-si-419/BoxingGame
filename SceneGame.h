@@ -19,7 +19,7 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(Input input);
 	/// <summary>
 	/// 描画処理
 	/// </summary>
@@ -38,8 +38,6 @@ public:
 	/// </summary>
 	void DrawGame();
 private:
-
-	bool m_isStartCountDown;//カウントダウンが始まったかどうか
 
 	bool m_isStartGame;//ゲームが始まったかどうか
 

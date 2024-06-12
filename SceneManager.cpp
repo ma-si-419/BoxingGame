@@ -14,9 +14,9 @@ void SceneManager::Init()
 {
 }
 
-void SceneManager::Update()
+void SceneManager::Update(Input input)
 {
-	m_pScene->Update();
+	m_pScene->Update(input);
 }
 
 void SceneManager::Draw()

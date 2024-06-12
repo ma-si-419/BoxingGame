@@ -22,7 +22,6 @@ SceneGame::SceneGame(SceneManager& sceneManager, DataManager& dataManager) :
 	m_timer(kTimelimit),
 	m_timeCount(0),
 	m_isDraw(false),
-	m_isStartCountDown(false),
 	m_isStartGame(false),
 	m_countDown(kCountDownTime)
 
@@ -61,25 +60,11 @@ void SceneGame::Init()
 	PlaySoundMem(m_bgmSound, DX_PLAYTYPE_LOOP);
 }
 
-void SceneGame::Update()
+void SceneGame::Update(Input input)
 {
 	int pad = GetJoypadInputState(PAD_INPUT_1);
-	//カウントダウンを始めるまで
-	if (!m_isStartCountDown)
-	{
-		if (CheckHitKey(KEY_INPUT_RETURN))
-		{
-			m_pUi->SetOperation(false);
-			m_isStartCountDown = true;
-		}
-		else if (pad & PAD_INPUT_A)
-		{
-			m_pUi->SetOperation(true);
-			m_isStartCountDown = true;
-		}
-	}
 	//カウントダウン処理
-	if (!m_isStartGame && m_isStartCountDown)
+	if (!m_isStartGame)
 	{
 		m_timeCount++;
 		if (m_timeCount > kFramelate)
@@ -94,8 +79,8 @@ void SceneGame::Update()
 	}
 	else
 	{
-		m_pPlayer->Update(m_pEnemy);
-		m_pEnemy->Update(m_pPlayer);
+		m_pPlayer->Update(m_pEnemy,input);
+		m_pEnemy->Update(m_pPlayer,input);
 	}
 	m_pCamera->Update();
 	m_pObstruct->Update();

@@ -1,6 +1,6 @@
 #pragma once
 #include "CharacterBase.h"
-
+class Input;
 class Player : public CharacterBase
 {
 public:
@@ -8,7 +8,7 @@ public:
 	~Player();
 
 	void Init();
-	void Update(std::shared_ptr<CharacterBase> enemy);
+	void Update(std::shared_ptr<CharacterBase> enemy,Input input);
 	void Draw();
 
 	//ƒ_ƒ[ƒW‚ğ•Ô‚·

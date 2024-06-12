@@ -37,8 +37,7 @@ SceneTitle::SceneTitle(SceneManager& sceneManager, DataManager& dataManager) :
 	m_fingerHandle(-1),
 	m_fingerPos(),
 	m_fingerShake(0),
-	m_selectCommand(Command::kStart),
-	m_isHitKey(true)
+	m_selectCommand(Command::kStart)
 {
 	m_logoHandle = LoadGraph("data/image/titleImage.png");
 	m_fingerHandle = LoadGraph("data/image/finger.png");
@@ -70,21 +69,21 @@ void SceneTitle::Init()
 	PlaySoundMem(m_bgmSound, DX_PLAYTYPE_LOOP);
 }
 
-void SceneTitle::Update()
+void SceneTitle::Update(Input input)
 {
 	m_pCamera->Update();
-	if (CheckHitKey(KEY_INPUT_UP) || CheckHitKey(KEY_INPUT_W))
+	if (input.IsTrigger("up"))
 	{
 		m_fingerPos.y = kFingerPosY[0];
 		m_selectCommand = Command::kStart;
 	}
-	else if (CheckHitKey(KEY_INPUT_DOWN) || CheckHitKey(KEY_INPUT_S))
+	else if (input.IsTrigger("down"))
 	{
 		m_fingerPos.y = kFingerPosY[1];
 		m_selectCommand = Command::kEnd;
 	}
 	//エンターキーが押されたとき
-	if (CheckHitKey(KEY_INPUT_RETURN) && !m_isHitKey)
+	if (input.IsTrigger("ok"))
 	{
 		if (m_selectCommand == Command::kStart)
 		{
@@ -94,13 +93,8 @@ void SceneTitle::Update()
 		{
 			m_sceneManager.GameEnd();
 		}
-		m_isHitKey = true;
 	}
-	//エンターキーが連打されないように
-	else if (!CheckHitKey(KEY_INPUT_RETURN))
-	{
-		m_isHitKey = false;
-	}
+
 
 	m_fingerShake += kFingerShakeSpeed;
 

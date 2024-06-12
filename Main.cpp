@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "DataManager.h"
 #include "SceneTitle.h"
+#include "Input.h"
 #include "Game.h"
 #include <memory>
 
@@ -22,6 +23,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SceneManager scene;
 	DataManager data;
 
+	Input input;
+
 	scene.ChangeScene(std::make_shared<SceneTitle>(scene, data));
 
 	scene.Init();
@@ -36,7 +39,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ClearDrawScreen();
 
 		// ÉQÅ[ÉÄÇÃèàóù
-		scene.Update();
+		input.Update();
+
+		scene.Update(input);
 
 		scene.Draw();
 

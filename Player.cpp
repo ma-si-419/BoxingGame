@@ -1,4 +1,12 @@
 #include "Player.h"
+#include "Input.h"
+
+namespace
+{
+	constexpr float kFallSpeed = 4.5f;
+	constexpr int kFinishDamage = 36;
+}
+
 Player::Player()
 {
 	m_model = MV1LoadModel("data/model/Player.mv1");
@@ -20,13 +28,13 @@ void Player::Init()
 	MV1SetPosition(m_model, m_pos);
 }
 
-void Player::Update(std::shared_ptr<CharacterBase> enemy)
+void Player::Update(std::shared_ptr<CharacterBase> enemy,Input input)
 {
 	//動けるタイミングだった時
 	if (!m_isGap && !m_isFinishGame)
 	{
 		//ガードボタンを押したとき
-		if (CheckHitKey(KEY_INPUT_X) && !m_isHitGuardKey)
+		if (input.IsPress("leftShoulder") && !m_isHitGuardKey)
 		{
 			ChangeAnim(anim::kGuard);
 			m_isGuard = true;
@@ -34,19 +42,13 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 			m_isPunch = false;
 		}
 		//パンチボタンを押したとき
-		if (CheckHitKey(KEY_INPUT_Z) && !m_isHitPunchKey && !m_isPunch)
+		if (input.IsTrigger("leftTrigger") && !m_isPunch)
 		{
 			ChangeAnim(anim::kPunch);
 			m_isPunch = true;
 			m_isGuard = false;
-			m_isHitPunchKey = true;
 			//相手がパンチを打っている状態だったらパンチの速度をあげる
 			m_isCounter = enemy->GetPunchState();
-		}
-		//パンチボタンがを離された時の処理
-		if (!CheckHitKey(KEY_INPUT_Z))
-		{
-			m_isHitPunchKey = false;
 		}
 		//ガードボタンが離されたときの処理
 		if (!CheckHitKey(KEY_INPUT_X))
@@ -103,6 +105,17 @@ void Player::Update(std::shared_ptr<CharacterBase> enemy)
 	{
 		m_isGap = true;
 	}
+	//試合が終わった時の処理
+	if (m_isFinishGame)
+	{
+		//試合に負けていたら
+		if (m_damage < -kFinishDamage)
+		{
+			//下に落ちていく処理を入れる
+			m_pos.y -= kFallSpeed;
+		}
+	}
+
 	MV1SetAttachAnimTime(m_model, m_attachAnim, m_animTime);
 	MV1SetPosition(m_model, m_pos);
 }

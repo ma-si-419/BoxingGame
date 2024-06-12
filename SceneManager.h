@@ -1,5 +1,6 @@
 #pragma once
 #include<memory>
+#include "Input.h"
 class SceneBase;
 class SceneManager
 {
@@ -12,7 +13,7 @@ public:
 	//初期化処理
 	void Init();
 	//更新処理
-	void Update();
+	void Update(Input input);
 	//描画処理
 	void Draw();
 	//別のシーンに移動する際に使用する関数
